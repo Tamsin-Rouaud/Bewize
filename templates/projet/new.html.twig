@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+
+{% set action = app.current_route == 'app_projet_ajouter' ? 'Nouveau Projet' :  projet.titre  %}
+
+{% set button = app.current_route == 'app_projet_ajouter' ? 'Continuer' : 'Modifier' %}
+
+{% block title %}{{ action }}{% endblock %}
+{% block extra_header %}
+<h1>{{action}}</h1>
+{% endblock %}
+
+
+{% block body %}
+
+
+        
+
+<div id="content">
+{{ form_errors(form) }}
+
+       
+        {{ form_start(form) }}
+
+        {{ form_row(form.titre, {label: 'Titre du projet'}) }}
+
+        {{ form_row(form.employe, {label: 'Inviter des membres'}) }}
+<br>
+<button type= 'submit' class="button button-submit">{{button}}</button>
+        
+
+        
+        
+
+
+
+{{ form_end(form) }}
+
+</div>
+{% endblock %}

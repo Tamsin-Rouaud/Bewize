@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fiche du projet - TaskLinker{% endblock %}
+
+{% block extra_header %} 
+<div class="flex-header">
+        <h1>{{ projet.titre }}</h1>
+        
+        <div class="user-list">
+            {% for employe in projet.employe %}
+                <div class="avatar">{{ employe.getInitiales() }}</div>
+            {% else %}
+                <p>Aucun employé assigné</p>
+            {% endfor %}
+        </div>
+
+        <a class="button" href="{{ path('app_projet_modifier', { id: projet.id }) }}">Modifier</a>
+    </div>
+{% endblock %}
+{% block body %}
+
+
+<div id="content">
+    <div id="tasks-container">
+    {% for statut, taches in statusList %}
+        <div class="task-column">
+            <h2>{{ statut|capitalize }}</h2>
+            <div class="tasks-list">
+                {% for tache in taches %}
+                    <a class="task" href="{{ path('app_tache_modifier', { id: tache.id }) }}">
+                        <h3>{{ tache.titre }}</h3>
+                        <p>{{ tache.description }}</p>
+                        <div class="task-infos">
+                            {% if tache.deadline %}
+                                <div class="task-deadline">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    {{ tache.deadline|date('d/m/Y') }}
+                                </div>
+                            {% endif %}
+                            {% if tache.employe %}
+                                <div class="mini-user">
+                                    {{ tache.employe.getInitiales() }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
+                <a href="{{ path('app_tache_ajouter', { id: projet.id }) }}" class="task-add">
+                    + Ajouter une tâche
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+</div>
+{% endblock %}
