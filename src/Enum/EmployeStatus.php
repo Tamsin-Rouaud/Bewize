@@ -4,10 +4,10 @@ namespace App\Enum;
 
 enum EmployeStatus: string
 {
-    case Cdi = 'cdi';
-    case Cdd = 'cdd';
-    case Freelance = 'freelance';
-    case Autres = 'autres';
+    case Cdi = 'Cdi';
+    case Cdd = 'Cdd';
+    case Freelance = 'Freelance';
+    case Autres = 'Autres';
     
     public function getLabel(): string
     {

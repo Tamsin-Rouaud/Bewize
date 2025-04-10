@@ -4,6 +4,7 @@ namespace App\Factory;
 
 use App\Entity\Employe;
 use App\Enum\EmployeStatus;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
 /**
@@ -16,8 +17,9 @@ final class EmployeFactory extends PersistentProxyObjectFactory
      *
      * @todo inject services if required
      */
-    public function __construct()
+    public function __construct(private readonly UserPasswordHasherInterface $hasher)
     {
+        parent::__construct();
     }
 
     public static function class(): string
@@ -34,10 +36,12 @@ final class EmployeFactory extends PersistentProxyObjectFactory
     {
         return [
             'date_entree' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'email' => self::faker()->email(),
+            'email' => self::faker()->unique()->email(),
             'nom' => self::faker()->text(10),
             'prenom' => self::faker()->text(6),
             'status' => self::faker()->randomElement(EmployeStatus::cases()),
+            'roles' => ['ROLE_COLLABORATEUR', 'ROLE_CHEF_DE_PROJET', 'ROLE_ADMIN'],
+            'password'=>$this->hasher->hashPassword(new Employe(),'password'),
         ];
     }
 

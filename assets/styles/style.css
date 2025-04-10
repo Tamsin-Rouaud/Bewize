@@ -487,6 +487,77 @@ form .select2-container--default .select2-selection--multiple .select2-selection
     font-size: 16px;
 }
 
+#main-container-register {
+    background: url('../img/registerbackground.jpeg') center no-repeat;
+    object-fit: contain;
+    display: flex;
+    min-height: 100vh;
+}
+
+.underline {
+    border: white 0.1px solid;
+    width: 100px;
+    display: inline-block;
+    margin-left: 0;
+    padding-left: 0;
+    font-size: 200;
+}
+
+#underline-container{
+    display: flex;
+    flex-direction: row;
+    width: 70%;
+    justify-content: center;
+}
+#button-register-dark, #button-register-light {
+    width: 45%;
+    justify-content: center;
+    font-weight: 400;
+    height: 74px;
+}
+
+#button-register-dark{
+    background: #1F5B50;
+    color: white;
+}
+
+#button-register-light {
+    color: #4D8077;
+}
+
+#nav-register {
+    background: unset;
+}
+
+#content-register {
+    background-color: #4D8077;
+    color: white;
+    width: 40%;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    margin: 100px auto;
+}
+
+
+
+#content-register form {
+    justify-content: center;
+    align-items: center;
+}
+#content-register form label{
+    color: white;
+    font-weight: 300;
+}
+
+.form-footer a {
+    color: white;
+}
+
+
 @media (max-width: 992px) {
     nav {
         width: 150px;

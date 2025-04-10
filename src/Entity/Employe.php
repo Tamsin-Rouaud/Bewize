@@ -4,26 +4,29 @@ namespace App\Entity;
 
 use App\Enum\EmployeStatus;
 use App\Repository\EmployeRepository;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EmployeRepository::class)]
-class Employe
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+class Employe implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Assert\Length(min: 3)]
     #[Assert\NotBlank()]
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 180, nullable:false)]
     private ?string $nom = null;
 
-    #[Assert\Length(min: 3)]
     #[Assert\NotBlank()]
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 180, nullable:false)]
     private ?string $prenom = null;
 
     #[Assert\Choice(callback: [EmployeStatus::class, 'cases'], message: 'Veuillez choisir un statut valide.')]
@@ -43,10 +46,26 @@ class Employe
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeImmutable $date_entree = null;
 
-     public function getId(): ?int
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column(type: 'json', nullable:true)]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
+    #[Assert\PasswordStrength(minScore: Assert\PasswordStrength::STRENGTH_STRONG)]
+    #[Assert\NotCompromisedPassword]
+    #[ORM\Column]
+    private ?string $password = null;
+
+    public function getId(): ?int
     {
         return $this->id;
     }
+    
+
 
     public function getNom(): ?string
     {
@@ -121,4 +140,63 @@ class Employe
 {
     return $this->prenom . ' ' . $this->nom;
 }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     *
+     * @return list<string>
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+
 }
