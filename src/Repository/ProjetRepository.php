@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Employe;
 use App\Entity\Projet;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -24,6 +25,17 @@ class ProjetRepository extends ServiceEntityRepository
         ->getResult();
     }
 
+
+    public function findByEmployeAndNonArchives(Employe $employe): array
+{
+    return $this->createQueryBuilder('p')
+        ->leftJoin('p.employe', 'e') 
+        ->andWhere('e = :employe')
+        ->andWhere('p.isArchived = false')
+        ->setParameter('employe', $employe)
+        ->getQuery()
+        ->getResult();
+}
 
     //    /**
     //     * @return Projet[] Returns an array of Projet objects

@@ -532,17 +532,25 @@ form .select2-container--default .select2-selection--multiple .select2-selection
 #content-register {
     background-color: #4D8077;
     color: white;
-    width: 40%;
+    width: 50%;
     border-radius: 25px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 20px;
 
     margin: 100px auto;
 }
 
-
+#main-register {
+    width: 100%;
+    flex: unset;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    margin-right: 190px;
+}
 
 #content-register form {
     justify-content: center;
@@ -557,7 +565,48 @@ form .select2-container--default .select2-selection--multiple .select2-selection
     color: white;
 }
 
+#link-register {
+    text-align: center;
+    font-weight: 300;
+}
 
+#title-login {
+    text-align: center;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#avatar-header {
+    color: #1C5B50;
+    background-color: white;
+    font-weight: bold;
+}
+
+#avatar-header a{
+    color: #1C5B50;
+    background-color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.avatar.no-color {
+    background: transparent;
+    border: 2px solid #ccc;
+    color: #333;
+}
+
+.color-1 { background-color: #f67280; }
+.color-2 { background-color: #6c5ce7; }
+.color-3 { background-color: #00b894; }
+.color-4 { background-color: #d823b1; }
+.color-5 { background-color: #46b5e9; }
+.color-6 { background-color: #A29BFE ; }
+.color-7 { background-color: #daeb45 ; }
 @media (max-width: 992px) {
     nav {
         width: 150px;

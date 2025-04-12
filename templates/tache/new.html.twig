@@ -23,10 +23,14 @@
             {{ form_row(form.employe, {label: 'Membre'}) }}
 
             <br>
-            <button type='submit' class="button button-submit">{{ button }}</button>
-            {% if tache.id %}
+            {% if is_granted('MODIFIER_TACHE', tache) or is_granted('MODIFIER_STATUT', tache) %}
+    <button type='submit' class="button button-submit">{{ button }}</button>
+{% endif %}
+
+{% if tache.id and is_granted('ROLE_CHEF_DE_PROJET') %}
     <a href="{{ path('app_tache_supprimer', { id: tache.id }) }}" class="delete-task">Supprimer la tâche</a>
 {% endif %}
+
 
 
         {{ form_end(form) }}

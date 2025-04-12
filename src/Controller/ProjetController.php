@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Security\Voter\ProjetVoter;
 use App\Entity\Projet;
 use App\Enum\TacheStatus;
 use App\Form\ProjetType;
@@ -11,56 +12,81 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class ProjetController extends AbstractController
 {
-    /** Affiche tous les projets non archivés */
-    #[Route('/', name: 'app_projets', methods:['GET'])]
-    public function index(ProjetRepository $repository): Response
-    {
-        $projets = $repository->findNonArchives();
-
-
-        return $this->render('projet/index.html.twig', [
-            
-            'projets' => $projets,
-        ]);
-    }
-
-    /** Affiche un projet en détail avec tableau des statuts */
-#[Route('/projet/{id}', name: 'app_projet_detail', requirements: ['id'=> '\d+'], methods: ['GET'])]
-public function show(int $id, ProjetRepository $repository): Response
+    #[IsGranted('IS_AUTHENTICATED')]
+#[Route('/', name: 'app_projets', methods: ['GET'])]
+public function index(ProjetRepository $repository): Response
 {
-    $projet = $repository->find($id);
+    
+    $employe = $this->getUser();
 
-    if (!$projet || $projet->isArchived()) {
-        $this->addFlash('warning', 'Ce projet est introuvable ou archivé.');
-        return $this->redirectToRoute('app_projets');
+    if ($this->isGranted('ROLE_CHEF_DE_PROJET')) {
+        $projets = $repository->findNonArchives();
+    } elseif ($this->isGranted('ROLE_COLLABORATEUR')) {
+        $projets = $repository->findByEmployeAndNonArchives($employe);
+    } else {
+        throw $this->createAccessDeniedException("Accès refusé.");
     }
 
-    // Crée une structure pour organiser les tâches par statut
-    $statusList = [];
-    foreach (TacheStatus::cases() as $status) {
-        $statusList[$status->value] = [];
-    }
-
-    foreach ($projet->getTaches() as $tache) {
-        $key = $tache->getStatus()->value;
-        $statusList[$key][] = $tache;
-    }
-
-    return $this->render('projet/detail.html.twig', [
-        'projet' => $projet,
-        'statusList' => $statusList,
+    return $this->render('projet/index.html.twig', [
+        'projets' => $projets,
     ]);
 }
 
 
+    /** Affiche un projet en détail avec tableau des statuts */
+
+
+    #[IsGranted('IS_AUTHENTICATED')]
+    #[Route('/projet/{id}', name: 'app_projet_detail', requirements: ['id'=> '\d+'], methods: ['GET'])]
+    public function show(int $id, ProjetRepository $repository): Response
+    {
+        $projet = $repository->find($id);
+    
+        if (!$projet || $projet->isArchived()) {
+            $this->addFlash('warning', 'Ce projet est introuvable ou archivé.');
+            return $this->redirectToRoute('app_projets');
+        }
+    
+        
+        $employe = $this->getUser();
+    
+        $this->denyAccessUnlessGranted(ProjetVoter::VOIR, $projet);
+
+    
+        // Organisation des tâches par statut
+        $statusList = [];
+        foreach (TacheStatus::cases() as $status) {
+            $statusList[$status->value] = [];
+        }
+    
+        foreach ($projet->getTaches() as $tache) {
+            $key = $tache->getStatus()->value;
+            $statusList[$key][] = $tache;
+        }
+    
+        return $this->render('projet/detail.html.twig', [
+            'projet' => $projet,
+            'statusList' => $statusList,
+        ]);
+    }
+    
+
+
 
     /** Crée un nouveau projet */
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/ajouter_projet', name: 'app_projet_ajouter', methods:['GET', 'POST'])]
         public function new(?Projet $projet,Request $request, EntityManagerInterface $manager): Response
     {
+        $employe = $this->getUser();
+        
+        if($employe) {
+            $this->denyAccessUnlessGranted('ROLE_CHEF_DE_PROJET');
+        }
         $projet ??= new Projet();
         $form = $this->createForm(ProjetType::class, $projet);
         $form->handleRequest($request);
@@ -78,9 +104,15 @@ public function show(int $id, ProjetRepository $repository): Response
     }
 
     /** Modifie un projet */
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/projet/{id}/modifier', name: 'app_projet_modifier')]
     public function edit(Request $request, Projet $projet, EntityManagerInterface $manager): Response
     {
+        $employe = $this->getUser();
+        
+        if($employe) {
+            $this->denyAccessUnlessGranted('ROLE_CHEF_DE_PROJET');
+        }
         $form = $this->createForm(ProjetType::class, $projet);
         $form->handleRequest($request);
 
@@ -100,42 +132,23 @@ public function show(int $id, ProjetRepository $repository): Response
     /**
      * Archiver un projet
      */
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/projet/{id}/archiver', name: 'app_projet_archiver')]
     public function archived(Projet $projet, EntityManagerInterface $manager): Response
     {
+        $employe = $this->getUser();
+        
+        if($employe) {
+            $this->denyAccessUnlessGranted('ROLE_CHEF_DE_PROJET');
+        }
         $projet->setIsArchived(true);
         $manager->flush();
     
         $this->addFlash('success', 'Projet archivé avec succès.');
-        return $this->redirectToRoute('app_projets'); // ou ta page d'accueil
+        return $this->redirectToRoute('app_projets'); 
     }
     
 
-//     #[Route('/projet/{id}', name: 'app_projet_detail')]
-// public function createStatusBoard(int $id, ProjetRepository $repository): Response
-// {
-//     $projet = $repository->find($id);
 
-//     if (!$projet) {
-//         throw $this->createNotFoundException('Projet non trouvé');
-//     }
-
-//     // Crée une structure pour organiser les tâches par statut
-//     $statusList = [];
-//     foreach (TacheStatus::cases() as $status) {
-//         $statusList[$status->value] = [];
-//     }
-
-//     // Classe les tâches selon leur statut
-//     foreach ($projet->getTaches() as $tache) {
-//         $key = $tache->getStatus()->value;
-//         $statusList[$key][] = $tache;
-//     }
-
-//     return $this->render('projet/detail.html.twig', [
-//         'projet' => $projet,
-//         'statusList' => $statusList,
-//     ]);
-// }
 
 }

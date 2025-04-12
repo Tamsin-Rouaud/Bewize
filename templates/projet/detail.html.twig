@@ -7,12 +7,15 @@
         <h1>{{ projet.titre }}</h1>
         
         <div class="user-list">
-            {% for employe in projet.employe %}
-                <div class="avatar">{{ employe.getInitiales() }}</div>
-            {% else %}
-                <p>Aucun employé assigné</p>
-            {% endfor %}
+    {% set hasTaches = projet.getTaches() is not empty %}
+
+    {% for employe in projet.employe %}
+        <div class="{{ hasTaches ? 'avatar color-' ~ (employe.id % 7 + 1) : 'avatar no-color' }}">
+            {{ employe.getInitiales() }}
         </div>
+    {% endfor %}
+</div>
+
 
         <a class="button" href="{{ path('app_projet_modifier', { id: projet.id }) }}">Modifier</a>
     </div>
@@ -45,9 +48,14 @@
                         </div>
                     </a>
                 {% endfor %}
-                <a href="{{ path('app_tache_ajouter', { id: projet.id }) }}" class="task-add">
-                    + Ajouter une tâche
-                </a>
+
+                
+                {% if is_granted('ROLE_CHEF_DE_PROJET') %}
+    <a href="{{ path('app_tache_ajouter', { id: projet.id }) }}" class="task-add">
+        + Ajouter une tâche
+    </a>
+{% endif %}
+
             </div>
         </div>
     {% endfor %}

@@ -27,7 +27,7 @@
 <body>
       <div id="main-container">
          <nav>
-            <a href="{{path('app_projets')}}" id="logo">
+            <a href="{{path('app_welcome')}}" id="logo">
             <img src="{{ asset('../assets/img/logo.png')}}" alt="Logo TaskLinker" />
             </a>
             <ul id="main-menu">
@@ -46,11 +46,26 @@
          </nav>
          <main>
             <header>
-               <div id="current-user"></div>
-               <div id="title-page">
+            <div id="title-page">
                   {% block extra_header %} {% endblock %}
 
                </div>
+            <div id="current-user">
+
+                
+                     {% if app.user %}
+               <div id="avatar-header" class='avatar '><a href="{{path('app_logout')}}"> {{ app.user.getInitiales() }}</a></div>
+{% else %}
+                <p></p>
+{% endif %}
+               
+    
+
+</div>
+               
+                  
+               
+               
             </header>
 
 

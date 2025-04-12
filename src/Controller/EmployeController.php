@@ -10,15 +10,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class EmployeController extends AbstractController
 {
 
-
+    #[IsGranted('IS_AUTHENTICATED')]
     /** Liste tous les employés */
     #[Route('/employes', name: 'app_employes', methods:['GET'])]
     public function index(EmployeRepository $repository): Response
     {
+        $employe = $this->getUser();
+        if($employe) {
+            $this->denyAccessUnlessGranted('ROLE_CHEF_DE_PROJET');
+        }
         return $this->render('employe/index.html.twig', [
             'employes' => $repository->findAll(),
 
@@ -28,9 +33,14 @@ final class EmployeController extends AbstractController
 
     /** Affiche les détails d’un employé et permet la modification*/
 
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/employe/{id}', name: 'app_employe_detail', requirements: ['id'=> '\d+'], methods: ['GET', 'POST'])]
     public function detail(Request $request, Employe $employe, EntityManagerInterface $manager): Response
     {
+        if($employe) {
+            $this->denyAccessUnlessGranted('ROLE_CHEF_DE_PROJET');
+        }
+
         $form = $this->createForm(EmployeType::class, $employe);
         $form->handleRequest($request);
 
@@ -47,11 +57,15 @@ final class EmployeController extends AbstractController
     ]);
     }
 
-    
+    #[IsGranted('IS_AUTHENTICATED')]
     /** Supprimer un employé */
     #[Route('/employe/{id}/supprimer', name: 'app_employe_supprimer')]
     public function supprimer(Employe $employe, EntityManagerInterface $manager): Response
     {
+
+        if($employe) {
+            $this->denyAccessUnlessGranted('ROLE_CHEF_DE_PROJET');
+        }
         $manager->remove($employe);
         $manager->flush();
 
