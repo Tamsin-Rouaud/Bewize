@@ -14,32 +14,31 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+
 final class ProjetController extends AbstractController
 {
+    /*** Afficher la liste des projets  ***/
     #[IsGranted('IS_AUTHENTICATED')]
-#[Route('/', name: 'app_projets', methods: ['GET'])]
-public function index(ProjetRepository $repository): Response
-{
-    
-    $employe = $this->getUser();
+    #[Route('/', name: 'app_projets', methods: ['GET'])]
+    public function index(ProjetRepository $repository): Response
+    {
+        
+        $employe = $this->getUser();
 
-    if ($this->isGranted('ROLE_CHEF_DE_PROJET')) {
-        $projets = $repository->findNonArchives();
-    } elseif ($this->isGranted('ROLE_COLLABORATEUR')) {
-        $projets = $repository->findByEmployeAndNonArchives($employe);
-    } else {
-        throw $this->createAccessDeniedException("Accès refusé.");
+        if ($this->isGranted('ROLE_CHEF_DE_PROJET')) {
+            $projets = $repository->findNonArchives();
+        } elseif ($this->isGranted('ROLE_COLLABORATEUR')) {
+            $projets = $repository->findByEmployeAndNonArchives($employe);
+        } else {
+            throw $this->createAccessDeniedException("Accès refusé.");
+        }
+
+        return $this->render('projet/index.html.twig', [
+            'projets' => $projets,
+        ]);
     }
 
-    return $this->render('projet/index.html.twig', [
-        'projets' => $projets,
-    ]);
-}
-
-
-    /** Affiche un projet en détail avec tableau des statuts */
-
-
+    /*** Afficher un projet en détail avec tableau des statuts ***/
     #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/projet/{id}', name: 'app_projet_detail', requirements: ['id'=> '\d+'], methods: ['GET'])]
     public function show(int $id, ProjetRepository $repository): Response
@@ -50,14 +49,10 @@ public function index(ProjetRepository $repository): Response
             $this->addFlash('warning', 'Ce projet est introuvable ou archivé.');
             return $this->redirectToRoute('app_projets');
         }
-    
-        
-        $employe = $this->getUser();
-    
+            
         $this->denyAccessUnlessGranted(ProjetVoter::VOIR, $projet);
 
-    
-        // Organisation des tâches par statut
+        // Organiser les tâches par statut
         $statusList = [];
         foreach (TacheStatus::cases() as $status) {
             $statusList[$status->value] = [];
@@ -74,19 +69,13 @@ public function index(ProjetRepository $repository): Response
         ]);
     }
     
-
-
-
-    /** Crée un nouveau projet */
+    /*** Créer un nouveau projet ***/
     #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/ajouter_projet', name: 'app_projet_ajouter', methods:['GET', 'POST'])]
         public function new(?Projet $projet,Request $request, EntityManagerInterface $manager): Response
     {
-        $employe = $this->getUser();
-        
-        if($employe) {
-            $this->denyAccessUnlessGranted('ROLE_CHEF_DE_PROJET');
-        }
+        $this->denyAccessUnlessGranted(ProjetVoter::MODIFIER, $projet);
+
         $projet ??= new Projet();
         $form = $this->createForm(ProjetType::class, $projet);
         $form->handleRequest($request);
@@ -103,16 +92,13 @@ public function index(ProjetRepository $repository): Response
         ]);
     }
 
-    /** Modifie un projet */
+    /*** Modifier un projet ***/
     #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/projet/{id}/modifier', name: 'app_projet_modifier')]
     public function edit(Request $request, Projet $projet, EntityManagerInterface $manager): Response
     {
-        $employe = $this->getUser();
-        
-        if($employe) {
-            $this->denyAccessUnlessGranted('ROLE_CHEF_DE_PROJET');
-        }
+        $this->denyAccessUnlessGranted(ProjetVoter::MODIFIER, $projet);
+
         $form = $this->createForm(ProjetType::class, $projet);
         $form->handleRequest($request);
 
@@ -129,18 +115,13 @@ public function index(ProjetRepository $repository): Response
         ]);
     }
 
-    /**
-     * Archiver un projet
-     */
+    /*** Archiver un projet ***/
     #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/projet/{id}/archiver', name: 'app_projet_archiver')]
     public function archived(Projet $projet, EntityManagerInterface $manager): Response
     {
-        $employe = $this->getUser();
-        
-        if($employe) {
-            $this->denyAccessUnlessGranted('ROLE_CHEF_DE_PROJET');
-        }
+        $this->denyAccessUnlessGranted(ProjetVoter::MODIFIER, $projet);
+
         $projet->setIsArchived(true);
         $manager->flush();
     

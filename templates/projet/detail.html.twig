@@ -4,24 +4,19 @@
 
 {% block extra_header %} 
 <div class="flex-header">
-        <h1>{{ projet.titre }}</h1>
-        
-        <div class="user-list">
+    <h1>{{ projet.titre }}</h1>
+    <div class="user-list">
     {% set hasTaches = projet.getTaches() is not empty %}
-
     {% for employe in projet.employe %}
         <div class="{{ hasTaches ? 'avatar color-' ~ (employe.id % 7 + 1) : 'avatar no-color' }}">
             {{ employe.getInitiales() }}
         </div>
     {% endfor %}
-</div>
-
-
-        <a class="button" href="{{ path('app_projet_modifier', { id: projet.id }) }}">Modifier</a>
     </div>
+    <a class="button" href="{{ path('app_projet_modifier', { id: projet.id }) }}">Modifier</a>
+</div>
 {% endblock %}
 {% block body %}
-
 
 <div id="content">
     <div id="tasks-container">
@@ -29,37 +24,33 @@
         <div class="task-column">
             <h2>{{ statut|capitalize }}</h2>
             <div class="tasks-list">
-                {% for tache in taches %}
-                    <a class="task" href="{{ path('app_tache_modifier', { id: tache.id }) }}">
-                        <h3>{{ tache.titre }}</h3>
-                        <p>{{ tache.description }}</p>
-                        <div class="task-infos">
-                            {% if tache.deadline %}
-                                <div class="task-deadline">
-                                    <i class="fa-regular fa-calendar"></i>
-                                    {{ tache.deadline|date('d/m/Y') }}
-                                </div>
-                            {% endif %}
-                            {% if tache.employe %}
-                                <div class="mini-user">
-                                    {{ tache.employe.getInitiales() }}
-                                </div>
-                            {% endif %}
+            {% for tache in taches %}
+                <a class="task" href="{{ path('app_tache_modifier', { id: tache.id }) }}">
+                    <h3>{{ tache.titre }}</h3>
+                    <p>{{ tache.description }}</p>
+                    <div class="task-infos">
+                    {% if tache.deadline %}
+                        <div class="task-deadline">
+                            <i class="fa-regular fa-calendar"></i>
+                            {{ tache.deadline|date('d/m/Y') }}
                         </div>
-                    </a>
-                {% endfor %}
-
-                
-                {% if is_granted('ROLE_CHEF_DE_PROJET') %}
-    <a href="{{ path('app_tache_ajouter', { id: projet.id }) }}" class="task-add">
-        + Ajouter une tâche
-    </a>
-{% endif %}
-
+                    {% endif %}
+                    {% if tache.employe %}
+                        <div class="mini-user">
+                            {{ tache.employe.getInitiales() }}
+                        </div>
+                    {% endif %}
+                    </div>
+                </a>
+            {% endfor %}
+            {% if is_granted('ROLE_CHEF_DE_PROJET') %}
+                <a href="{{ path('app_tache_ajouter', { id: projet.id }) }}" class="task-add">
+                    + Ajouter une tâche
+                </a>
+            {% endif %}
             </div>
         </div>
     {% endfor %}
-</div>
-
+    </div>
 </div>
 {% endblock %}

@@ -2,26 +2,21 @@
 
 {% block title %}Bienvenue sur TaskLinker{% endblock %}
 
-
-
 {% block body %}
 <h1 >Bienvenue sur TaskLinker</h1>
 <p>Commencez dès maintenant - gratuitement </p>
 <br>
 <br>
 <div class="form-footer">
-         <a href="{{ path('app_login') }}">Vous avez déjà un compte ?</a>
+        <a href="{{ path('app_login') }}">Vous avez déjà un compte ?</a>
 </div>
-        <br>
-        <a href="{{path('app_login')}}" id="button-register-dark" class="button button-submit ">Se connecter</a>
-        <div id="underline-container">
-    <p><span class="underline"></span>  ou  <span class="underline"></span></p>
-       </div> 
-       <br>
-        <a href="{{path('app_register')}}" id="button-register-light" class="button button-submit ">S'inscrire</a>
-        <br>
-    
 <br>
-    
-
+<a href="{{path('app_login')}}" id="button-register-dark" class="button button-submit ">Se connecter</a>
+<div id="underline-container">
+        <p><span class="underline"></span>  ou  <span class="underline"></span></p>
+</div> 
+<br>
+<a href="{{path('app_register')}}" id="button-register-light" class="button button-submit ">S'inscrire</a>
+<br>
+<br>
 {% endblock %}

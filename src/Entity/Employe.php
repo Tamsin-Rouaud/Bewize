@@ -65,8 +65,6 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
     
-
-
     public function getNom(): ?string
     {
         return $this->nom;
@@ -137,9 +135,9 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function __toString(): string
-{
-    return $this->prenom . ' ' . $this->nom;
-}
+    {
+        return $this->prenom . ' ' . $this->nom;
+    }
 
     /**
      * A visual identifier that represents this user.

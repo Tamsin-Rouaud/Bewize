@@ -14,9 +14,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class EmployeController extends AbstractController
 {
-
+    /*** Liste tous les employés ***/
     #[IsGranted('IS_AUTHENTICATED')]
-    /** Liste tous les employés */
     #[Route('/employes', name: 'app_employes', methods:['GET'])]
     public function index(EmployeRepository $repository): Response
     {
@@ -30,9 +29,7 @@ final class EmployeController extends AbstractController
         ]);
     }
 
-
-    /** Affiche les détails d’un employé et permet la modification*/
-
+    /*** Afficher les détails d’un employé et permettre sa modification ***/
     #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/employe/{id}', name: 'app_employe_detail', requirements: ['id'=> '\d+'], methods: ['GET', 'POST'])]
     public function detail(Request $request, Employe $employe, EntityManagerInterface $manager): Response
@@ -57,8 +54,8 @@ final class EmployeController extends AbstractController
     ]);
     }
 
-    #[IsGranted('IS_AUTHENTICATED')]
     /** Supprimer un employé */
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/employe/{id}/supprimer', name: 'app_employe_supprimer')]
     public function supprimer(Employe $employe, EntityManagerInterface $manager): Response
     {

@@ -11,7 +11,7 @@ final class TacheVoter extends Voter
 {
     public const MODIFIER_STATUT = 'MODIFIER_STATUT';
     public const MODIFIER_TACHE = 'MODIFIER_TACHE';
-    public const VOIR = 'VOIR_TACHE'; // 👈 nouveau droit
+    public const VOIR = 'VOIR_TACHE';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -30,20 +30,23 @@ final class TacheVoter extends Voter
         /** @var Tache $tache */
         $tache = $subject;
 
-        // Chef de projet = tous les droits
+        // Le chef de projet a tous les droits
         if (in_array('ROLE_CHEF_DE_PROJET', $user->getRoles())) {
             return true;
         }
 
         switch ($attribute) {
             case self::MODIFIER_STATUT:
+                // Seul l'employé assigné peut modifier le statut
                 return $tache->getEmploye() === $user;
 
             case self::MODIFIER_TACHE:
+                // Aucun collaborateur ne peut modifier toute la tâche
                 return false;
 
             case self::VOIR:
-                return $tache->getEmploye() === $user; // ou tu peux élargir si besoin
+                // Tous les employés du projet peuvent voir la tâche
+                return $tache->getProjet()->getEmploye()->contains($user);
         }
 
         return false;

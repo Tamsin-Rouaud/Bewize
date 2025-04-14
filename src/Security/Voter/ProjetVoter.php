@@ -2,10 +2,11 @@
 
 namespace App\Security\Voter;
 
-
+use App\Entity\Projet;
+use App\Entity\Employe;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\User\UserInterface;
+
 
 final class ProjetVoter extends Voter
 { // On définit deux types d'autorisations : voir et modifier

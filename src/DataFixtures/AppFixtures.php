@@ -12,13 +12,13 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        // Crée 5 employés
+        // Créer 5 employés
         EmployeFactory::createMany(5);
 
-        // Crée 3 projets
+        // Créer 3 projets
         ProjetFactory::createMany(3);
 
-        // Crée une tâche liée à un projet et un employé
+        // Créer une tâche liée à un projet et un employé
         TacheFactory::createOne([
             'titre' => 'Créer page projet',
             'description' => 'Créer la vue et le contrôleur',
@@ -26,7 +26,7 @@ class AppFixtures extends Fixture
             'employe' => EmployeFactory::random(),
         ]);
 
-        // Crée plusieurs tâches aléatoires
+        // Créer plusieurs tâches aléatoires
         TacheFactory::createMany(10);
     }
 }

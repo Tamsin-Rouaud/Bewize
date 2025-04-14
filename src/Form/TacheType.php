@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class TacheType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
-{
+    {
     $isCollaborateur = $options['is_collaborateur']; // récupéré depuis le contrôleur
 
     $builder
@@ -47,15 +47,15 @@ class TacheType extends AbstractType
             'label' => 'Statut',
             'placeholder' => 'Choisir un statut',
         ]);
-}
+    }
 
 
-public function configureOptions(OptionsResolver $resolver): void
-{
-    $resolver->setDefaults([
-        'data_class' => Tache::class,
-        'is_collaborateur' => false, // valeur par défaut
-    ]);
-}
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Tache::class,
+            'is_collaborateur' => false, // valeur par défaut
+        ]);
+    }
 
 }

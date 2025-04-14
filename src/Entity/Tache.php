@@ -40,8 +40,6 @@ class Tache
     #[ORM\JoinColumn(nullable: true, onDelete:'SET NULL')]
     private ?Employe $employe = null;
 
-    
-
     public function getId(): ?int
     {
         return $this->id;
